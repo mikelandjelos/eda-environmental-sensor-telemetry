@@ -1,0 +1,127 @@
+asyncapi: 3.0.0
+
+info:
+  title: Environmental Sensor Telemetry System
+  version: 1.0.0
+  description: >
+    A system for reading sensor data, analyzing it, and providing event
+    information.
+
+servers:
+  mqtt-broker:
+    host: 'mosquitto-broker:1883'
+    protocol: mqtt
+
+channels:
+  sensor/data:
+    address: sensor/data
+    messages:
+      publishSensorData.message:
+        $ref: '#/components/messages/SensorDataMessage'
+      subscribeToSensorData.message:
+        $ref: '#/components/messages/SensorDataMessage'
+    description: Channel for sensor data publication
+  
+  analytics/events:
+    address: analytics/events
+    messages:
+      publishAnalyticsEvents.message:
+        $ref: '#/components/messages/AnalyticsDataMessage'
+      subscribeToAnalyticsEvents.message:
+        $ref: '#/components/messages/AnalyticsDataMessage'
+    description: Channel for event information based on sensor data
+
+operations:
+  publishSensorData:
+    action: receive
+    channel:
+      $ref: '#/channels/sensor~1data'
+    summary: Publishes sensor data
+    messages:
+      - $ref: '#/channels/sensor~1data/messages/publishSensorData.message'
+  
+  subscribeToSensorData:
+    action: send
+    channel:
+      $ref: '#/channels/sensor~1data'
+    summary: Subscribes to receive sensor data
+    messages:
+      - $ref: '#/channels/sensor~1data/messages/subscribeToSensorData.message'
+  
+  publishAnalyticsEvents:
+    action: receive
+    channel:
+      $ref: '#/channels/analytics~1events'
+    summary: Publishing event information
+    messages:
+      - $ref: '#/channels/analytics~1events/messages/publishAnalyticsEvents.message'
+  
+  subscribeToAnalyticsEvents:
+    action: send
+    channel:
+      $ref: '#/channels/analytics~1events'
+    summary: Subscribes to analytics events
+    messages:
+      - $ref: >-
+          #/channels/analytics~1events/messages/subscribeToAnalyticsEvents.message
+
+components:
+  messages:
+    SensorDataMessage:
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/sensorDataPayload'
+    AnalyticsDataMessage:
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/analyticsDataPayload'
+  
+  schemas:
+    sensorDataPayload:
+      type: object
+      properties:
+        ts:
+          type: string
+          format: date-time
+          description: Timestamp of the sensor reading
+        device:
+          type: string
+          description: Device identifier
+        co:
+          type: number
+          description: CO level
+        humidity:
+          type: number
+          description: Humidity level
+        light:
+          type: boolean
+          description: Light status
+        lpg:
+          type: number
+          description: LPG level
+        motion:
+          type: boolean
+          description: Motion detected
+        smoke:
+          type: number
+          description: Smoke level
+        temp:
+          type: number
+          description: Temperature level
+    
+    analyticsDataPayload:
+      type: object
+      properties:
+        eventType:
+          type: string
+          description: Type of detected event
+        values:
+          type: object
+          description: Sensor values at the time of event detection
+        location:
+          type: string
+          description: Location of the event
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of the event
