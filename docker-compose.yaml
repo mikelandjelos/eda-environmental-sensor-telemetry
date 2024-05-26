@@ -111,3 +111,22 @@ services:
       - est-bridge
     secrets:
       - influx-token
+
+  # ---------------------------------------------------------------------------------------------------------
+  # ANALYTICS SERVICE - NODE + TS
+  # ---------------------------------------------------------------------------------------------------------
+
+  analytics-engine:
+    image: environmental-telemetry-analytics
+    container_name: analytics-engine
+    environment:
+      - MQTT_BROKER_HOST=${MOSQUITTO_HOST}
+      - MQTT_BROKER_PORT=${MOSQUITTO_PORT}
+      - SAMPLE_WINDOW_SIZE=${SAMPLE_WINDOW_SIZE}
+      - DEVIATION_PERCENT_THRESHOLD=${DEVIATION_PERCENT_THRESHOLD}
+    depends_on:
+      - first-sensor
+      - second-sensor
+      - third-sensor
+    networks:
+      - est-bridge
