@@ -166,6 +166,8 @@ services:
       - MQTT_EVENTS_TOPIC=${MQTT_EVENTS_TOPIC}
       - CLICKHOUSE_HOST=${CLICKHOUSE_HOST}
       - CLICKHOUSE_PORT=${CLICKHOUSE_PORT}
+    ports:
+      - "8080:8080" # http://localhost:8080/swagger/index.html
     depends_on:
       - analytics-engine
       - clickhouse
