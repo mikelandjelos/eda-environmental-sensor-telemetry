@@ -1,4 +1,4 @@
-namespace EventInfo.Configuration;
+namespace EventInfo.Configurations;
 
 public class MqttSettings
 {

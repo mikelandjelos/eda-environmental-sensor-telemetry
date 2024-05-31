@@ -16,7 +16,7 @@ public class StatisticData
     public double DeviationNominal { get; set; }
     public double DeviationPercent { get; set; }
     public double RunningAverage { get; set; }
-    public int HistoryLength { get; set; }
+    public uint HistoryLength { get; set; }
 }
 
 public enum SensorEventType

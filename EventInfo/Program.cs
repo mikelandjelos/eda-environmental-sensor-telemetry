@@ -1,4 +1,4 @@
-using EventInfo.Configuration;
+using EventInfo.Configurations;
 using EventInfo.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +11,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.Configure<MqttSettings>(builder.Configuration.GetSection("DefaultMqttSettings"));
+builder.Services.Configure<ClickHouseSettings>(builder.Configuration.GetSection("DefaultClickHouseSettings"));
+
+builder.Services.AddTransient<ClickHouseService>();
 builder.Services.AddHostedService<MqttService>();
 
 var app = builder.Build();

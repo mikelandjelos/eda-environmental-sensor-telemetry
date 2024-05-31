@@ -47,8 +47,8 @@ services:
       - ${MOSQUITTO_ROOT}/data:/mosquitto/data
       - ${MOSQUITTO_ROOT}/log:/mosquitto/log
     ports:
-      - "1883:1883"
-      - "9001:9001"
+      - "1883:1883" # MQTT
+      - "9001:9001" # WebSockets
     stdin_open: true 
     tty: true
     networks:
@@ -130,3 +130,49 @@ services:
       - third-sensor
     networks:
       - est-bridge
+  
+  # ---------------------------------------------------------------------------------------------------------
+  # CLICKHOUSE - HTAP DB + WEB UI
+  # ---------------------------------------------------------------------------------------------------------
+
+  clickhouse:
+    image: clickhouse/clickhouse-server
+    container_name: clickhouse
+    ports:
+      - "9000:9000" # clickhouse protocol
+      - "8123:8123" # http
+    volumes:
+      - ${CLICKHOUSE_ROOT}/:/docker-entrypoint-initdb.d/:ro
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 262144
+        hard: 262144
+    networks:
+      - est-bridge
+
+  # curl -X POST 'http://localhost:8123/' --data-binary 'SELECT * FROM environmental_sensor_telemetry.sensor_data FORMAT JSON;'
+
+  # ---------------------------------------------------------------------------------------------------------
+  # EVENT INFO SERVICE - C# (.NET)
+  # ---------------------------------------------------------------------------------------------------------
+
+  event-info:
+    image: environmental-telemetry-event-info
+    container_name: event-info
+    environment:
+      - MQTT_BROKER_HOST=${MOSQUITTO_HOST}
+      - MQTT_BROKER_PORT=${MOSQUITTO_PORT}
+      - MQTT_EVENTS_TOPIC=${MQTT_EVENTS_TOPIC}
+      - CLICKHOUSE_HOST=${CLICKHOUSE_HOST}
+      - CLICKHOUSE_PORT=${CLICKHOUSE_PORT}
+    depends_on:
+      - analytics-engine
+      - clickhouse
+    networks:
+      - est-bridge
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 1s
+        max_attempts: 5
