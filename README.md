@@ -5,3 +5,5 @@
 - [Sensor services](./sensor/README.md)
 - [Analytics service](./analytics/README.md)
 - [Event info service](./EventInfo/README.md)
+
+![picture](./assets/Environmental%20Sensor%20Telemetry.png)
